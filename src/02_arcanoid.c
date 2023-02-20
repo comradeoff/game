@@ -22,6 +22,7 @@ struct Ball {
 char map[HEIGHT][WIDTH + 1];
 struct Racket racket;
 struct Ball ball;
+int hit_cnt = 0;
 
 void init_ball() {
     move_ball(2, 2);
@@ -59,6 +60,8 @@ void auto_move_ball() {
               ball.y + sin(ball.alpha) * ball.speed);
 
     if ((map[ball.iy][ball.ix] == '#') || (map[ball.iy][ball.ix] == '@')) {
+        if (map[ball.iy][ball.ix] == '@') { hit_cnt++; }
+
         if ((ball.ix != tmp.ix) && (ball.iy != tmp.iy)) {
             if (map[tmp.iy][ball.ix] == map[ball.iy][tmp.ix]) { tmp.alpha = tmp.alpha + M_PI; }
             else {
@@ -118,13 +121,17 @@ int main(){
         draw();
 
         if (run) { auto_move_ball(); }
+        if (ball.iy > HEIGHT) { run = FALSE; hit_cnt = 0; }
 
         if (GetKeyState('A') < 0) { move_racket(racket.x - 3); }
         if (GetKeyState('D') < 0) { move_racket(racket.x + 3); }
         if (GetKeyState('W') < 0) { run = TRUE; }
         if (!run) { move_ball(racket.x + racket.w / 2, racket.y - 1); }
+
+        printf("Hits: %i\n", hit_cnt);
     }
     while (GetKeyState(VK_ESCAPE) >= 0);
 
+    system("pause");
     return 0;
 }
